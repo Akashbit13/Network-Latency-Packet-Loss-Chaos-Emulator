@@ -1,15 +1,12 @@
 #include <iostream>
 #include <cstring>
+#include <cstdio>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
 int main() {
-
-    // Total packets expected from the client
-    int totalPackets = 100;
-
-    // Create a UDP socket
+    // Create UDP socket
     int serverSocket = socket(AF_INET, SOCK_DGRAM, 0);
 
     if (serverSocket < 0) {
@@ -25,9 +22,10 @@ int main() {
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket to port 8080
-    if (bind(serverSocket,
-             (struct sockaddr*)&serverAddress,
-             sizeof(serverAddress)) < 0) {
+    if (bind(
+            serverSocket,
+            (struct sockaddr*)&serverAddress,
+            sizeof(serverAddress)) < 0) {
 
         perror("Bind failed");
         close(serverSocket);
@@ -44,8 +42,8 @@ int main() {
 
     int receivedPackets = 0;
 
-    // Receive packets
-    for (int i = 0; i < totalPackets; i++) {
+    // Receive 100 packets
+    for (int i = 0; i < 100; i++) {
 
         int bytesReceived = recvfrom(
             serverSocket,
@@ -61,18 +59,32 @@ int main() {
             break;
         }
 
-        // Add string ending
         buffer[bytesReceived] = '\0';
 
         receivedPackets++;
 
         std::cout << "Received: " << buffer << std::endl;
+
+        // Send the packet back to the client
+        int bytesSent = sendto(
+            serverSocket,
+            buffer,
+            bytesReceived,
+            0,
+            (struct sockaddr*)&clientAddress,
+            clientLength
+        );
+
+        if (bytesSent < 0) {
+            perror("Sending response failed");
+            break;
+        }
     }
 
-    // Calculate lost packets
+    // Display packet results
+    int totalPackets = 100;
     int lostPackets = totalPackets - receivedPackets;
 
-    // Calculate packet loss percentage
     double packetLoss = (lostPackets * 100.0) / totalPackets;
 
     std::cout << std::endl;
@@ -83,7 +95,7 @@ int main() {
     std::cout << "Packet Loss      : " << packetLoss << "%" << std::endl;
     std::cout << "===========================================" << std::endl;
 
-    // Close the socket
+    // Close socket
     close(serverSocket);
 
     return 0;
