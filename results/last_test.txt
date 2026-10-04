@@ -1,0 +1,12 @@
+========== LAST NETWORK TEST ==========
+Original Data     : hello akash this is my network testing project
+Packet Loss       : 0%
+Simulated Latency : 0 ms
+Data Units        : 10
+Received Units    : 10
+Lost Units        : 0
+Received Bytes    : 46
+Lost Bytes        : 0
+Data Loss         : 0%
+Average Latency   : 0.281885 ms
+=======================================
